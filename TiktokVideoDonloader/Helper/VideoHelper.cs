@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TiktokVideoDonloader.Extensions;
 using TiktokVideoDonloader.Models;
@@ -12,6 +13,41 @@ namespace TiktokVideoDonloader.Helper
 {
     public static class VideoHelper
     {
+        public static async Task<string> GetNoWatermarkUrl(string tiktokUrl)
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
+
+            var apiUrl = "https://www.tikwm.com/api/";
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("url", tiktokUrl)
+            });
+
+            var response = await client.PostAsync(apiUrl, content);
+            Utilities.Delay(1);
+            var json = await response.Content.ReadAsStringAsync();
+
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            if (root.GetProperty("code").GetInt32() != 0)
+                throw new Exception(root.GetProperty("msg").GetString());
+
+            return root.GetProperty("data").GetProperty("play").GetString();
+        }
+
+        public static async Task DownloadVideo(string videoUrl)
+        {
+            using var client = new HttpClient();
+            var response = await client.GetAsync(videoUrl);
+
+            var fileName = $"tiktok_{DateTime.Now:yyyyMMddHHmmss}.mp4";
+            using var stream = await response.Content.ReadAsStreamAsync();
+            using var fileStream = File.Create(fileName);
+            await stream.CopyToAsync(fileStream);
+        }
+
         public static string LinkVideoOneVideoMP4(string url, IWebDriver _webDriverMp4)
         { 
             if (_webDriverMp4 == null) _webDriverMp4 = UtilitiesBrowser.OpenBrower(true, 1);

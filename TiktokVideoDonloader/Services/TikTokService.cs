@@ -64,7 +64,7 @@ namespace TiktokVideoDonloader.Services
         //    return tikTokModelList;
         //}
 
-        public static List<TikTokModel> GetListVideo(string url, IWebDriver _webDriver, string PathSave)
+        public static List<TikTokModel> GetListVideo(string url, IWebDriver _webDriver, string PathSave, CancellationToken cancellationToken)
         {
             bool flagStop = false;
             List<TikTokModel> tikTokModelList = new List<TikTokModel>();
@@ -107,6 +107,7 @@ namespace TiktokVideoDonloader.Services
                     //check captcha
                     while (true)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         html = _webDriver.PageSource;
                         bool decryption = CaptchaService.CaptchaResolve(html);
                         if (decryption == true)
@@ -148,9 +149,11 @@ namespace TiktokVideoDonloader.Services
                     Utilities.Delay(5);
                     if (watch.Elapsed.TotalMinutes >= 5) break;
 
-                    if (flagStop)
+                    if (cancellationToken.IsCancellationRequested)
                     {
                         tikTokModelList = listTiktok.DistinctBy(i => i.ID).ToList();
+                        Program.HOME_FORM.OutStatus("Task Stopping!");
+                        Utilities.Delay(3);
                         break;
                     }
                     if (lastLocation == valueLocation) break;

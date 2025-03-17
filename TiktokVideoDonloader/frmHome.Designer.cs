@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             grpDownloadList = new GroupBox();
-            btnDownload = new Button();
             btnSelectFile = new Button();
             txtFileImport = new TextBox();
             lblListUsers = new Label();
+            btnDownload = new Button();
             grbDownloader = new GroupBox();
             numericThread = new NumericUpDown();
             btnOpen = new Button();
@@ -44,8 +44,6 @@
             lblId = new Label();
             txtUrlVideo = new TextBox();
             lblUrl = new Label();
-            lblProgress = new Label();
-            progressBar = new ProgressBar();
             txtThongKe = new TextBox();
             lblThongKe = new Label();
             lblThread = new Label();
@@ -57,10 +55,15 @@
             btnSelectFolder = new Button();
             txtPathSave = new TextBox();
             lblPathSave = new Label();
+            lblProgress = new Label();
+            pbDownload = new ProgressBar();
             tabControl1 = new TabControl();
             tabVideoList = new TabPage();
             dgvVideoList = new DataGridView();
             tabImportFile = new TabPage();
+            lbDownloadImport = new Label();
+            pbDownloadImport = new ProgressBar();
+            btnDownloadImport = new Button();
             dgvImportFile = new DataGridView();
             grpDownloadList.SuspendLayout();
             grbDownloader.SuspendLayout();
@@ -74,7 +77,6 @@
             // 
             // grpDownloadList
             // 
-            grpDownloadList.Controls.Add(btnDownload);
             grpDownloadList.Controls.Add(btnSelectFile);
             grpDownloadList.Controls.Add(txtFileImport);
             grpDownloadList.Controls.Add(lblListUsers);
@@ -83,22 +85,10 @@
             grpDownloadList.Margin = new Padding(3, 4, 3, 4);
             grpDownloadList.Name = "grpDownloadList";
             grpDownloadList.Padding = new Padding(3, 4, 3, 4);
-            grpDownloadList.Size = new Size(638, 99);
+            grpDownloadList.Size = new Size(638, 69);
             grpDownloadList.TabIndex = 23;
             grpDownloadList.TabStop = false;
             grpDownloadList.Text = "Download List from txt File";
-            // 
-            // btnDownload
-            // 
-            btnDownload.Font = new Font("Segoe UI", 7.8F);
-            btnDownload.Location = new Point(520, 61);
-            btnDownload.Margin = new Padding(3, 4, 3, 4);
-            btnDownload.Name = "btnDownload";
-            btnDownload.Size = new Size(103, 30);
-            btnDownload.TabIndex = 3;
-            btnDownload.Text = "Download";
-            btnDownload.UseVisualStyleBackColor = true;
-            btnDownload.Click += btnDownload_Click;
             // 
             // btnSelectFile
             // 
@@ -131,6 +121,18 @@
             lblListUsers.TabIndex = 0;
             lblListUsers.Text = "Import File :";
             // 
+            // btnDownload
+            // 
+            btnDownload.Font = new Font("Segoe UI", 7.8F);
+            btnDownload.Location = new Point(525, 7);
+            btnDownload.Margin = new Padding(3, 4, 3, 4);
+            btnDownload.Name = "btnDownload";
+            btnDownload.Size = new Size(103, 30);
+            btnDownload.TabIndex = 3;
+            btnDownload.Text = "Download";
+            btnDownload.UseVisualStyleBackColor = true;
+            btnDownload.Click += btnDownload_Click;
+            // 
             // grbDownloader
             // 
             grbDownloader.Controls.Add(numericThread);
@@ -143,8 +145,6 @@
             grbDownloader.Controls.Add(lblId);
             grbDownloader.Controls.Add(txtUrlVideo);
             grbDownloader.Controls.Add(lblUrl);
-            grbDownloader.Controls.Add(lblProgress);
-            grbDownloader.Controls.Add(progressBar);
             grbDownloader.Controls.Add(txtThongKe);
             grbDownloader.Controls.Add(lblThongKe);
             grbDownloader.Controls.Add(lblThread);
@@ -176,7 +176,7 @@
             // btnOpen
             // 
             btnOpen.Font = new Font("Segoe UI", 7.8F);
-            btnOpen.Location = new Point(503, 250);
+            btnOpen.Location = new Point(503, 242);
             btnOpen.Margin = new Padding(3, 4, 3, 4);
             btnOpen.Name = "btnOpen";
             btnOpen.Size = new Size(120, 31);
@@ -188,7 +188,7 @@
             // txtStatus
             // 
             txtStatus.Font = new Font("Segoe UI", 7.20000029F);
-            txtStatus.Location = new Point(80, 219);
+            txtStatus.Location = new Point(80, 211);
             txtStatus.Margin = new Padding(3, 4, 3, 4);
             txtStatus.Name = "txtStatus";
             txtStatus.ReadOnly = true;
@@ -199,7 +199,7 @@
             // 
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 7.8F);
-            lblStatus.Location = new Point(26, 219);
+            lblStatus.Location = new Point(26, 211);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(50, 17);
             lblStatus.TabIndex = 45;
@@ -208,7 +208,7 @@
             // txtAccount
             // 
             txtAccount.Font = new Font("Segoe UI", 7.20000029F);
-            txtAccount.Location = new Point(395, 188);
+            txtAccount.Location = new Point(395, 180);
             txtAccount.Margin = new Padding(3, 4, 3, 4);
             txtAccount.Name = "txtAccount";
             txtAccount.ReadOnly = true;
@@ -219,7 +219,7 @@
             // 
             lblAccount.AutoSize = true;
             lblAccount.Font = new Font("Segoe UI", 7.8F);
-            lblAccount.Location = new Point(328, 189);
+            lblAccount.Location = new Point(328, 181);
             lblAccount.Name = "lblAccount";
             lblAccount.Size = new Size(61, 17);
             lblAccount.TabIndex = 43;
@@ -228,7 +228,7 @@
             // txtVideoId
             // 
             txtVideoId.Font = new Font("Segoe UI", 7.20000029F);
-            txtVideoId.Location = new Point(80, 188);
+            txtVideoId.Location = new Point(80, 180);
             txtVideoId.Margin = new Padding(3, 4, 3, 4);
             txtVideoId.Name = "txtVideoId";
             txtVideoId.ReadOnly = true;
@@ -239,7 +239,7 @@
             // 
             lblId.AutoSize = true;
             lblId.Font = new Font("Segoe UI", 7.8F);
-            lblId.Location = new Point(49, 188);
+            lblId.Location = new Point(49, 180);
             lblId.Name = "lblId";
             lblId.Size = new Size(27, 17);
             lblId.TabIndex = 41;
@@ -248,7 +248,7 @@
             // txtUrlVideo
             // 
             txtUrlVideo.Font = new Font("Segoe UI", 7.20000029F);
-            txtUrlVideo.Location = new Point(80, 157);
+            txtUrlVideo.Location = new Point(80, 149);
             txtUrlVideo.Margin = new Padding(3, 4, 3, 4);
             txtUrlVideo.Name = "txtUrlVideo";
             txtUrlVideo.ReadOnly = true;
@@ -259,29 +259,11 @@
             // 
             lblUrl.AutoSize = true;
             lblUrl.Font = new Font("Segoe UI", 7.8F);
-            lblUrl.Location = new Point(44, 157);
+            lblUrl.Location = new Point(44, 149);
             lblUrl.Name = "lblUrl";
             lblUrl.Size = new Size(32, 17);
             lblUrl.TabIndex = 39;
             lblUrl.Text = "Url :";
-            // 
-            // lblProgress
-            // 
-            lblProgress.AutoSize = true;
-            lblProgress.BackColor = Color.Transparent;
-            lblProgress.Location = new Point(373, 129);
-            lblProgress.Name = "lblProgress";
-            lblProgress.Size = new Size(123, 17);
-            lblProgress.TabIndex = 38;
-            lblProgress.Text = "Download Progress";
-            // 
-            // progressBar
-            // 
-            progressBar.Location = new Point(80, 124);
-            progressBar.Margin = new Padding(3, 4, 3, 4);
-            progressBar.Name = "progressBar";
-            progressBar.Size = new Size(287, 22);
-            progressBar.TabIndex = 37;
             // 
             // txtThongKe
             // 
@@ -399,23 +381,45 @@
             lblPathSave.TabIndex = 26;
             lblPathSave.Text = "Path Save :";
             // 
+            // lblProgress
+            // 
+            lblProgress.AutoSize = true;
+            lblProgress.BackColor = Color.Transparent;
+            lblProgress.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblProgress.Location = new Point(302, 14);
+            lblProgress.Name = "lblProgress";
+            lblProgress.Size = new Size(123, 17);
+            lblProgress.TabIndex = 38;
+            lblProgress.Text = "Download Progress";
+            // 
+            // pbDownload
+            // 
+            pbDownload.Location = new Point(9, 9);
+            pbDownload.Margin = new Padding(3, 4, 3, 4);
+            pbDownload.Name = "pbDownload";
+            pbDownload.Size = new Size(287, 22);
+            pbDownload.TabIndex = 37;
+            // 
             // tabControl1
             // 
             tabControl1.Controls.Add(tabVideoList);
             tabControl1.Controls.Add(tabImportFile);
-            tabControl1.Location = new Point(23, 423);
+            tabControl1.Location = new Point(23, 383);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(642, 392);
+            tabControl1.Size = new Size(642, 432);
             tabControl1.TabIndex = 24;
             // 
             // tabVideoList
             // 
+            tabVideoList.Controls.Add(btnDownload);
             tabVideoList.Controls.Add(dgvVideoList);
+            tabVideoList.Controls.Add(lblProgress);
+            tabVideoList.Controls.Add(pbDownload);
             tabVideoList.Location = new Point(4, 29);
             tabVideoList.Name = "tabVideoList";
             tabVideoList.Padding = new Padding(3);
-            tabVideoList.Size = new Size(634, 359);
+            tabVideoList.Size = new Size(634, 399);
             tabVideoList.TabIndex = 0;
             tabVideoList.Text = "Video List";
             tabVideoList.UseVisualStyleBackColor = true;
@@ -423,30 +427,64 @@
             // dgvVideoList
             // 
             dgvVideoList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvVideoList.Location = new Point(9, 6);
+            dgvVideoList.Location = new Point(9, 44);
             dgvVideoList.Name = "dgvVideoList";
             dgvVideoList.RowHeadersWidth = 51;
-            dgvVideoList.Size = new Size(625, 347);
+            dgvVideoList.Size = new Size(625, 355);
             dgvVideoList.TabIndex = 0;
             // 
             // tabImportFile
             // 
+            tabImportFile.Controls.Add(lbDownloadImport);
+            tabImportFile.Controls.Add(pbDownloadImport);
+            tabImportFile.Controls.Add(btnDownloadImport);
             tabImportFile.Controls.Add(dgvImportFile);
             tabImportFile.Location = new Point(4, 29);
             tabImportFile.Name = "tabImportFile";
             tabImportFile.Padding = new Padding(3);
-            tabImportFile.Size = new Size(634, 359);
+            tabImportFile.Size = new Size(634, 399);
             tabImportFile.TabIndex = 1;
             tabImportFile.Text = "Import File";
             tabImportFile.UseVisualStyleBackColor = true;
             // 
+            // lbDownloadImport
+            // 
+            lbDownloadImport.AutoSize = true;
+            lbDownloadImport.BackColor = Color.Transparent;
+            lbDownloadImport.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lbDownloadImport.Location = new Point(302, 14);
+            lbDownloadImport.Name = "lbDownloadImport";
+            lbDownloadImport.Size = new Size(123, 17);
+            lbDownloadImport.TabIndex = 40;
+            lbDownloadImport.Text = "Download Progress";
+            // 
+            // pbDownloadImport
+            // 
+            pbDownloadImport.Location = new Point(9, 9);
+            pbDownloadImport.Margin = new Padding(3, 4, 3, 4);
+            pbDownloadImport.Name = "pbDownloadImport";
+            pbDownloadImport.Size = new Size(287, 22);
+            pbDownloadImport.TabIndex = 39;
+            // 
+            // btnDownloadImport
+            // 
+            btnDownloadImport.Font = new Font("Segoe UI", 7.8F);
+            btnDownloadImport.Location = new Point(525, 7);
+            btnDownloadImport.Margin = new Padding(3, 4, 3, 4);
+            btnDownloadImport.Name = "btnDownloadImport";
+            btnDownloadImport.Size = new Size(103, 30);
+            btnDownloadImport.TabIndex = 4;
+            btnDownloadImport.Text = "Download";
+            btnDownloadImport.UseVisualStyleBackColor = true;
+            btnDownloadImport.Click += btnDownloadImport_Click;
+            // 
             // dgvImportFile
             // 
             dgvImportFile.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvImportFile.Location = new Point(9, 6);
+            dgvImportFile.Location = new Point(9, 44);
             dgvImportFile.Name = "dgvImportFile";
             dgvImportFile.RowHeadersWidth = 51;
-            dgvImportFile.Size = new Size(625, 353);
+            dgvImportFile.Size = new Size(625, 355);
             dgvImportFile.TabIndex = 0;
             // 
             // frmHome
@@ -468,8 +506,10 @@
             ((System.ComponentModel.ISupportInitialize)numericThread).EndInit();
             tabControl1.ResumeLayout(false);
             tabVideoList.ResumeLayout(false);
+            tabVideoList.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvVideoList).EndInit();
             tabImportFile.ResumeLayout(false);
+            tabImportFile.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvImportFile).EndInit();
             ResumeLayout(false);
         }
@@ -492,7 +532,7 @@
         private TextBox txtUrlVideo;
         private Label lblUrl;
         private Label lblProgress;
-        private ProgressBar progressBar;
+        private ProgressBar pbDownload;
         private TextBox txtThongKe;
         private Label lblThongKe;
         private Label lblThread;
@@ -509,5 +549,8 @@
         private DataGridView dgvVideoList;
         private TabPage tabImportFile;
         private DataGridView dgvImportFile;
+        private Button btnDownloadImport;
+        private Label lbDownloadImport;
+        private ProgressBar pbDownloadImport;
     }
 }
