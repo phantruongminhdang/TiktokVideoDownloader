@@ -25,8 +25,7 @@ namespace TiktokVideoDonloader
             {
                 this.Invoke(new MethodInvoker(delegate ()
                 {
-                    txtStatus.Text = status;
-                    txtStatus.Refresh();
+                    txtStatus.AppendText(status + "\r\n");
                 }));
             }
             catch (Exception ex)
@@ -34,6 +33,24 @@ namespace TiktokVideoDonloader
                 this.Invoke(new MethodInvoker(delegate ()
                 {
                     txtStatus.Text = ex.Message.ToString();
+                }));
+            }
+        }
+
+        public void OutStatusImport(string status)
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    txtStatusImport.AppendText(status + "\r\n");
+                }));
+            }
+            catch (Exception ex)
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    txtStatusImport.AppendText(ex.Message.ToString() + "\r\n");
                 }));
             }
         }
@@ -69,12 +86,27 @@ namespace TiktokVideoDonloader
                     txtVideoId.Text = videoId;
                 }));
             }
-            catch (Exception ex)
+            catch
+            {
+            }
+        }
+
+        public void OutUrlVideoImport(string urlVideo)
+        {
+            try
             {
                 this.Invoke(new MethodInvoker(delegate ()
                 {
-                    txtUrlUser.Text = ex.Message.ToString();
+                    var videoId = urlVideo.Split('/').LastOrDefault();
+                    var account = urlVideo.Split('/').Where(x => x.Contains("@")).FirstOrDefault();
+                    txtAccountImport.Text = account;
+                    txtUrlVideoImport.Text = urlVideo;
+                    txtVideoIdImport.Text = videoId;
                 }));
+            }
+            catch
+            {
+                
             }
         }
 
@@ -164,6 +196,26 @@ namespace TiktokVideoDonloader
             }
         }
 
+
+        public void OutTiktokModelImport(TikTokModel tikTokModel)
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    txtUrlVideoImport.Text = tikTokModel.UrlLink;
+                    txtVideoIdImport.Text = tikTokModel.ID;
+                    txtAccountImport.Text = tikTokModel.User;
+                }));
+            }
+            catch (Exception ex)
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    txtUrlVideoImport.Text = ex.Message.ToString();
+                }));
+            }
+        }
         public void OutImportFile(List<TikTokModel> tikTokModels)
         {
             try
@@ -235,6 +287,26 @@ namespace TiktokVideoDonloader
             }
         }
 
+        public void ClearTiktokModelImport()
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    txtUrlVideoImport.Text = string.Empty;
+                    txtVideoIdImport.Text = string.Empty;
+                    txtAccountImport.Text = string.Empty;
+                }));
+            }
+            catch (Exception ex)
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    txtUrlVideoImport.Text = ex.Message.ToString();
+                }));
+            }
+        }
+
         public void ClearThongKe()
         {
             try
@@ -262,8 +334,6 @@ namespace TiktokVideoDonloader
 
                     //button
                     btnDownload.Enabled = true;
-                    btnDownloadImport.Enabled = true;
-                    btnSelectFile.Enabled = true;
                     btnSelectFolder.Enabled = true;
                     btnOpen.Enabled = true;
                     btnStart.Enabled = true;
@@ -271,7 +341,6 @@ namespace TiktokVideoDonloader
                     //txt input
                     txtPathSave.ReadOnly = false;
                     txtUrlUser.ReadOnly = false;
-                    txtFileImport.ReadOnly = false;
 
                     //checkbox
                     chkChayAn.Enabled = true;
@@ -294,8 +363,6 @@ namespace TiktokVideoDonloader
 
                     //button
                     btnDownload.Enabled = false;
-                    btnDownloadImport.Enabled = false;
-                    btnSelectFile.Enabled = false;
                     btnSelectFolder.Enabled = false;
                     btnOpen.Enabled = false;
                     btnStart.Enabled = false;
@@ -303,13 +370,59 @@ namespace TiktokVideoDonloader
                     //txt input
                     txtPathSave.ReadOnly = true;
                     txtUrlUser.ReadOnly = true;
-                    txtFileImport.ReadOnly = true;
 
                     //checkbox
                     chkChayAn.Enabled = false;
 
                     //numeric
                     numericThread.Enabled = false;
+                }));
+            }
+            catch
+            {
+
+            }
+        }
+
+        public void EnableWhenLoadFileDoneImport()
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+
+                    //button
+                    btnDownloadImport.Enabled = true;
+                    btnSelectFile.Enabled = true;
+                    btnSelectFolderImport.Enabled = true;
+                    btnOpenImport.Enabled = true;
+
+                    //txt input
+                    txtPathSaveImport.ReadOnly = false;
+                    txtFileImport.ReadOnly = false;
+                }));
+            }
+            catch
+            {
+
+            }
+        }
+        public void DisableWhenLoadFileImport()
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+
+                    //button
+                    btnDownloadImport.Enabled = false;
+                    btnSelectFile.Enabled = false;
+                    btnSelectFolderImport.Enabled = false;
+                    btnOpenImport.Enabled = false;
+
+                    //txt input
+                    txtPathSaveImport.ReadOnly = true;
+                    txtFileImport.ReadOnly = true;
                 }));
             }
             catch
@@ -324,6 +437,7 @@ namespace TiktokVideoDonloader
 
         public IWebDriver _webDriver;
         string DEFAULT_FOLDER_PATH = Path.Combine(Environment.CurrentDirectory, @"DataTiktok\");
+        string DEFAULT_FOLDER_PATH_IMPORT = Path.Combine(Environment.CurrentDirectory, @"DataTiktok\");
         public string PathSave = string.Empty;
 
         List<TikTokModel> ListVideo = new List<TikTokModel>();
@@ -350,6 +464,19 @@ namespace TiktokVideoDonloader
             }
         }
 
+        private void btnSelectFolderImport_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    txtPathSaveImport.Text = fbd.SelectedPath;
+                    DEFAULT_FOLDER_PATH_IMPORT = fbd.SelectedPath;
+                }
+            }
+        }
         private void btnStart_Click(object sender, EventArgs e)
         {
             ClearThongKe();
@@ -421,7 +548,7 @@ namespace TiktokVideoDonloader
                 }
 
                 ListVideoImport = ListVideoImport.Distinct().ToList();
-                OutStatus("Import list video url successfully!!");
+                OutStatusImport("Import list video url successfully!!");
                 OutImportFile(ListVideoImport);
             }
         }
@@ -431,6 +558,18 @@ namespace TiktokVideoDonloader
             try
             {
                 Process.Start("explorer.exe", txtPathSave.Text);
+            }
+            catch (Win32Exception win32Exception)
+            {
+                MessageBox.Show(win32Exception.Message);
+            }
+        }
+
+        private void btnOpenImport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start("explorer.exe", txtPathSaveImport.Text);
             }
             catch (Win32Exception win32Exception)
             {
@@ -570,7 +709,7 @@ namespace TiktokVideoDonloader
                 //Task.WaitAll(taskwait);
 
                 //ListVideo.Clear();
-                OutStatus($"All Downloads Completed!");
+                OutStatusImport($"All Downloads Completed!");
             }
             else
             {
@@ -602,8 +741,7 @@ namespace TiktokVideoDonloader
                 {
                     if (!this.IsDisposed)
                     {
-                        txtStatus.Text = $"Downloaded.... ";
-                        txtStatus.Refresh();
+                        OutStatus($"Downloaded.... ");
                         OutStatus($"Download video successfully: {tiktokModel.ID}");
                         ListVideo.Where(x => x.ID == tiktokModel.ID)
                         .Select(x => { x.isDownload = true; return x; }).ToList();
@@ -618,7 +756,7 @@ namespace TiktokVideoDonloader
                 {
                     if (!this.IsDisposed)
                     {
-                        txtStatus.Text = ex.ToString();
+                        OutStatus(ex.ToString());
                     }
                 }));
             }
@@ -634,11 +772,11 @@ namespace TiktokVideoDonloader
                 {
                     if (!this.IsDisposed)
                     {
-                        OutTiktokModel(tiktokModel);
-                        OutStatus($"Start download video: {tiktokModel.ID}");
-                        OutStatus($"Starting ... download video: {tiktokModel.UrlLink}");
+                        OutTiktokModelImport(tiktokModel);
+                        OutStatusImport($"Start download video: {tiktokModel.ID}");
+                        OutStatusImport($"Starting ... download video: {tiktokModel.UrlLink}");
                         //OutStatusWithUrl($"Get Link MP4 ... Download Video: {urlTiktok}");
-                        OutStatus($"Get Link MP4 ... Download Video: {tiktokModel.UrlLink}");
+                        OutStatusImport($"Get Link MP4 ... Download Video: {tiktokModel.UrlLink}");
                     }
                 }));
 
@@ -648,9 +786,8 @@ namespace TiktokVideoDonloader
                 {
                     if (!this.IsDisposed)
                     {
-                        txtStatus.Text = $"Downloaded.... ";
-                        txtStatus.Refresh();
-                        OutStatus($"Download video successfully: {tiktokModel.ID}");
+                        OutStatusImport($"Downloaded.... ");
+                        OutStatusImport($"Download video successfully: {tiktokModel.ID}");
                         ListVideoImport.Where(x => x.ID == tiktokModel.ID)
                         .Select(x => { x.isDownload = true; return x; }).ToList();
                         OutVideoImport(ListVideoImport);
@@ -664,7 +801,7 @@ namespace TiktokVideoDonloader
                 {
                     if (!this.IsDisposed)
                     {
-                        txtStatus.Text = ex.ToString();
+                        OutStatusImport(ex.ToString());
                     }
                 }));
             }
@@ -688,13 +825,13 @@ namespace TiktokVideoDonloader
 
                 string nameFileVideo = idVideo + ".mp4";
                 string fullPathVideo = pathSaveFile + "\\" + nameFileVideo;
-                //OutStatusWithUrl($"Save File {nameFileVideo}");
                 if (string.IsNullOrEmpty(pathSaveFile))
                 {
                     pathSaveFile = DEFAULT_FOLDER_PATH;
                 }
 
                 OutStatus($"Start Download file MP4: {idVideo}");
+                OutStatus($"Downloading.......");
                 using (var webClient = new WebClient())
                 {
                     webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
@@ -729,18 +866,18 @@ namespace TiktokVideoDonloader
 
                 string idVideo = lines.LastOrDefault();
 
-                string pathSaveFile = DEFAULT_FOLDER_PATH + "\\" + userName;
+                string pathSaveFile = DEFAULT_FOLDER_PATH_IMPORT + "\\" + userName;
                 Utilities.CreateIfMissing(pathSaveFile);
 
                 string nameFileVideo = idVideo + ".mp4";
                 string fullPathVideo = pathSaveFile + "\\" + nameFileVideo;
-                //OutStatusWithUrl($"Save File {nameFileVideo}");
                 if (string.IsNullOrEmpty(pathSaveFile))
                 {
-                    pathSaveFile = DEFAULT_FOLDER_PATH;
+                    pathSaveFile = DEFAULT_FOLDER_PATH_IMPORT;
                 }
 
-                OutStatus($"Start Download file MP4: {idVideo}");
+                OutStatusImport($"Start Download file MP4: {idVideo}");
+                OutStatusImport($"Downloading.......");
                 using (var webClient = new WebClient())
                 {
                     webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(CompletedImport);
@@ -780,8 +917,6 @@ namespace TiktokVideoDonloader
             {
                 if (!this.IsDisposed)
                 {
-                    txtStatus.Text = $"Downloading.......";
-                    txtStatus.Refresh();
                     pbDownload.Value = e.ProgressPercentage;
                     lblProgress.Text = e.ProgressPercentage + "% complete... (" + e.BytesReceived + "/" + e.TotalBytesToReceive + ")"; ;
                 }
@@ -794,8 +929,7 @@ namespace TiktokVideoDonloader
             {
                 if (!this.IsDisposed)
                 {
-                    txtStatus.Text = $"Download Completed!";
-                    txtStatus.Refresh();
+                    OutStatus($"Download Completed!");
                 }
             }));
         }
@@ -818,8 +952,6 @@ namespace TiktokVideoDonloader
             {
                 if (!this.IsDisposed)
                 {
-                    txtStatus.Text = $"Downloading.......";
-                    txtStatus.Refresh();
                     pbDownloadImport.Value = e.ProgressPercentage;
                     lbDownloadImport.Text = e.ProgressPercentage + "% complete... (" + e.BytesReceived + "/" + e.TotalBytesToReceive + ")"; ;
                 }
@@ -832,17 +964,16 @@ namespace TiktokVideoDonloader
             {
                 if (!this.IsDisposed)
                 {
-                    txtStatus.Text = $"Download Completed!";
-                    txtStatus.Refresh();
+                    OutStatusImport($"Download Completed!");
                 }
             }));
         }
 
         private async void btnDownloadImport_Click(object sender, EventArgs e)
         {
-            DisableWhenLoadFile();
+            DisableWhenLoadFileImport();
             await DownloadVideoListTiktokImport();
-            EnableWhenLoadFileDone();
+            EnableWhenLoadFileDoneImport();
         }
 
         private async void btnDownload_Click(object sender, EventArgs e)
@@ -851,5 +982,7 @@ namespace TiktokVideoDonloader
             await DownloadVideoListTiktok();
             EnableWhenLoadFileDone();
         }
+
+        
     }
 }
