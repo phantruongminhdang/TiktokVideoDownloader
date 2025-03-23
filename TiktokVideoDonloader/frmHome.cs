@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using System.Windows.Forms;
 using TiktokVideoDonloader.Helper;
 using TiktokVideoDonloader.Models;
 using TiktokVideoDonloader.Services;
@@ -55,24 +56,6 @@ namespace TiktokVideoDonloader
             }
         }
 
-        public void OutThongKe(string thongKe)
-        {
-            try
-            {
-                this.Invoke(new MethodInvoker(delegate ()
-                {
-                    txtThongKe.Text = thongKe;
-                }));
-            }
-            catch (Exception ex)
-            {
-                this.Invoke(new MethodInvoker(delegate ()
-                {
-                    txtThongKe.Text = ex.Message.ToString();
-                }));
-            }
-        }
-
         public void OutUrlVideo(string urlVideo)
         {
             try
@@ -106,32 +89,17 @@ namespace TiktokVideoDonloader
             }
             catch
             {
-                
+
             }
         }
 
-        public void OutVideo(List<TikTokModel> tikTokModels)
+        public void UpdateUIDGVVideo(List<TikTokModel> tikTokModels)
         {
             try
             {
                 this.Invoke(new MethodInvoker(delegate ()
                 {
-                    dgvVideoList.DataSource = null;
-                    dgvVideoList.DataSource = tikTokModels.OrderBy(x => x.isDownload).ToList();
-                    dgvVideoList.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                    dgvVideoList.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-
-                    foreach (DataGridViewRow row in dgvVideoList.Rows)
-                    {
-                        if (Convert.ToBoolean(row.Cells["isDownload"].Value))
-                        {
-                            row.DefaultCellStyle.BackColor = Color.Yellow;
-                        }
-                        else
-                        {
-                            //txtStatus.Text = "Error while processing color for DataGridView!";
-                        }
-                    }
+                    dgvVideoList.Refresh();
                 }));
             }
             catch (Exception ex)
@@ -143,28 +111,13 @@ namespace TiktokVideoDonloader
             }
         }
 
-        public void OutVideoImport(List<TikTokModel> tikTokModels)
+        public void UpdateUIDGVVideoImport(List<TikTokModel> tikTokModels)
         {
             try
             {
                 this.Invoke(new MethodInvoker(delegate ()
                 {
-                    dgvImportFile.DataSource = null;
-                    dgvImportFile.DataSource = tikTokModels.OrderBy(x => x.isDownload).ToList();
-                    dgvImportFile.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                    dgvImportFile.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-
-                    foreach (DataGridViewRow row in dgvImportFile.Rows)
-                    {
-                        if (Convert.ToBoolean(row.Cells["isDownload"].Value))
-                        {
-                            row.DefaultCellStyle.BackColor = Color.Yellow;
-                        }
-                        else
-                        {
-                            //txtStatus.Text = "Error while processing color for DataGridView!";
-                        }
-                    }
+                    dgvImportFile.Refresh();
                 }));
             }
             catch (Exception ex)
@@ -216,6 +169,40 @@ namespace TiktokVideoDonloader
                 }));
             }
         }
+
+        public void OutVideo(List<TikTokModel> tikTokModels)
+        {
+            try
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    dgvVideoList.DataSource = null;
+                    dgvVideoList.DataSource = tikTokModels.OrderBy(x => x.isDownload).ToList();
+                    dgvVideoList.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                    dgvVideoList.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+                    foreach (DataGridViewRow row in dgvVideoList.Rows)
+                    {
+                        if (Convert.ToBoolean(row.Cells["isDownload"].Value))
+                        {
+                            row.DefaultCellStyle.BackColor = Color.Yellow;
+                        }
+                        else
+                        {
+                            //txtStatus.Text = "Error while processing color for DataGridView!";
+                        }
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    OutStatus("Error while getting data to view!!");
+                }));
+            }
+        }
+
         public void OutImportFile(List<TikTokModel> tikTokModels)
         {
             try
@@ -448,6 +435,10 @@ namespace TiktokVideoDonloader
         bool isHidden = true;
 
         private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSourceDownload;
+        private CancellationTokenSource _cancellationTokenSourceDownloadImport;
+
+        private readonly TikTokDownloadService _downloadService = new();
 
         #endregion
         private void btnSelectFolder_Click(object sender, EventArgs e)
@@ -609,7 +600,7 @@ namespace TiktokVideoDonloader
                 {
                     ////Download  
                     //DownloadVideoListTiktok();
-                    OutVideo(ListVideo);
+                    UpdateUIDGVVideo(ListVideo);
                     if (cancellationToken.IsCancellationRequested)
                     {
                         OutStatus("Task Stopped!");
@@ -643,33 +634,43 @@ namespace TiktokVideoDonloader
         {
             if (ListVideo != null && ListVideo.Count > 0)
             {
+                _cancellationTokenSourceDownload = new CancellationTokenSource();
+                var progress = new Progress<(int percentage, long received, long total)>(p =>
+                {
+                    UIHelpers.UpdateProgress(pbDownload, lblProgress, p.percentage, p.received, p.total);
+                });
                 int iDownload = 1;
                 List<Task> taskList = new List<Task>();
                 foreach (var tiktokModel in ListVideo)
                 {
-                    //Task task = Task.Factory.StartNew(() =>
-                    //{
+                    _cancellationTokenSourceDownload.Token.ThrowIfCancellationRequested();
 
-
-                    //    OutThongKe($"{iDownload} - {ListVideo.Count}");
-                    //    iDownload++;
-                    //});
-                    await DownloadVideoTiktok(tiktokModel);
-                    //taskList.Add(DownloadVideoTiktok(tiktokModel));
-                    //DownloadVideoTiktok(tiktokModel).Wait();
-                    //await Task.WhenAll(taskList);
-
-                    OutThongKe($"{iDownload} - {ListVideo.Count}");
-                    iDownload++;
-                    //if (iDownload % 5 == 0)
-                    //{
-                    //    await Task.WhenAll(taskList);
-                    //}
+                    try
+                    {
+                        OutTiktokModel(tiktokModel);
+                        OutStatus($"Start download video: {tiktokModel.ID}");
+                        OutStatus($"Starting ... download video: {tiktokModel.UrlLink}");
+                        //OutStatusWithUrl($"Get Link MP4 ... Download Video: {urlTiktok}");
+                        OutStatus($"Get Link MP4 ... Download Video: {tiktokModel.UrlLink}");
+                        await _downloadService.DownloadVideoAsync(
+                            tiktokModel,
+                            DEFAULT_FOLDER_PATH,
+                            progress,
+                            _cancellationTokenSourceDownload.Token
+                            );
+                        OutStatus($"Download video successfully: {tiktokModel.ID}");
+                        OutStatus($"Downloaded: {iDownload} - {ListVideo.Count} videos");
+                        iDownload++;
+                        tiktokModel.isDownload = true;
+                        UpdateUIDGVVideo(ListVideo);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle specific exceptions
+                        OutStatus(ex.Message);
+                        MessageBox.Show("Stopped Download Process!!");
+                    }
                 }
-                // await Task.WhenAll(taskList);
-                //Task.WaitAll(taskwait);
-
-                //ListVideo.Clear();
                 OutStatus($"All Downloads Completed!");
             }
             else
@@ -680,35 +681,47 @@ namespace TiktokVideoDonloader
 
         private async Task DownloadVideoListTiktokImport()
         {
+
             if (ListVideoImport != null && ListVideoImport.Count > 0)
             {
+                _cancellationTokenSourceDownloadImport = new CancellationTokenSource();
+                var progress = new Progress<(int percentage, long received, long total)>(p =>
+                {
+                    UIHelpers.UpdateProgress(pbDownloadImport, lbDownloadImport, p.percentage, p.received, p.total);
+                });
                 int iDownload = 1;
                 List<Task> taskList = new List<Task>();
                 foreach (var tiktokModel in ListVideoImport)
                 {
-                    //Task task = Task.Factory.StartNew(() =>
-                    //{
+                    _cancellationTokenSourceDownloadImport.Token.ThrowIfCancellationRequested();
 
+                    try
+                    {
+                        OutTiktokModelImport(tiktokModel);
+                        OutStatusImport($"Start download video: {tiktokModel.ID}");
+                        OutStatusImport($"Starting ... download video: {tiktokModel.UrlLink}");
+                        //OutStatusWithUrl($"Get Link MP4 ... Download Video: {urlTiktok}");
+                        OutStatusImport($"Get Link MP4 ... Download Video: {tiktokModel.UrlLink}");
+                        await _downloadService.DownloadVideoAsync(
+                            tiktokModel,
+                            DEFAULT_FOLDER_PATH_IMPORT,
+                            progress,
+                            _cancellationTokenSourceDownloadImport.Token
+                            );
+                        OutStatusImport($"Download video successfully: {tiktokModel.ID}");
+                        OutStatusImport($"Downloaded: {iDownload} - {ListVideoImport.Count} videos");
+                        iDownload++;
+                        tiktokModel.isDownload = true;
+                        UpdateUIDGVVideoImport(ListVideoImport);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle specific exceptions
+                        OutStatusImport(ex.Message);
+                        MessageBox.Show("Stopped Download Process!!");
+                    }
 
-                    //    OutThongKe($"{iDownload} - {ListVideo.Count}");
-                    //    iDownload++;
-                    //});
-                    await DownloadVideoTiktokImport(tiktokModel);
-                    //taskList.Add(DownloadVideoTiktokImport(tiktokModel));
-                    //DownloadVideoTiktokImport(tiktokModel).Wait();
-                    //await Task.WhenAll(taskList);
-
-                    OutThongKe($"{iDownload} - {ListVideoImport.Count}");
-                    iDownload++;
-                    //if (iDownload % 5 == 0)
-                    //{
-                    //    await Task.WhenAll(taskList);
-                    //}
                 }
-                // await Task.WhenAll(taskList);
-                //Task.WaitAll(taskwait);
-
-                //ListVideo.Clear();
                 OutStatusImport($"All Downloads Completed!");
             }
             else
@@ -717,270 +730,57 @@ namespace TiktokVideoDonloader
             }
         }
 
-        private async Task DownloadVideoTiktok(TikTokModel tiktokModel)
-        {
-
-            //https:www.tiktok.com/@chinafactorystyle/video/332546565765568
-            try
-            {
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    if (!this.IsDisposed)
-                    {
-                        OutTiktokModel(tiktokModel);
-                        OutStatus($"Start download video: {tiktokModel.ID}");
-                        OutStatus($"Starting ... download video: {tiktokModel.UrlLink}");
-                        //OutStatusWithUrl($"Get Link MP4 ... Download Video: {urlTiktok}");
-                        OutStatus($"Get Link MP4 ... Download Video: {tiktokModel.UrlLink}");
-                    }
-                }));
-
-                await DownloadVideoTiktokAsync(tiktokModel);
-
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    if (!this.IsDisposed)
-                    {
-                        OutStatus($"Downloaded.... ");
-                        OutStatus($"Download video successfully: {tiktokModel.ID}");
-                        ListVideo.Where(x => x.ID == tiktokModel.ID)
-                        .Select(x => { x.isDownload = true; return x; }).ToList();
-                        OutVideo(ListVideo);
-                    }
-                }));
-
-            }
-            catch (Exception ex)
-            {
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    if (!this.IsDisposed)
-                    {
-                        OutStatus(ex.ToString());
-                    }
-                }));
-            }
-        }
-
-        private async Task DownloadVideoTiktokImport(TikTokModel tiktokModel)
-        {
-
-            //https:www.tiktok.com/@chinafactorystyle/video/332546565765568
-            try
-            {
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    if (!this.IsDisposed)
-                    {
-                        OutTiktokModelImport(tiktokModel);
-                        OutStatusImport($"Start download video: {tiktokModel.ID}");
-                        OutStatusImport($"Starting ... download video: {tiktokModel.UrlLink}");
-                        //OutStatusWithUrl($"Get Link MP4 ... Download Video: {urlTiktok}");
-                        OutStatusImport($"Get Link MP4 ... Download Video: {tiktokModel.UrlLink}");
-                    }
-                }));
-
-                await DownloadVideoTiktokImportAsync(tiktokModel);
-
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    if (!this.IsDisposed)
-                    {
-                        OutStatusImport($"Downloaded.... ");
-                        OutStatusImport($"Download video successfully: {tiktokModel.ID}");
-                        ListVideoImport.Where(x => x.ID == tiktokModel.ID)
-                        .Select(x => { x.isDownload = true; return x; }).ToList();
-                        OutVideoImport(ListVideoImport);
-                    }
-                }));
-
-            }
-            catch (Exception ex)
-            {
-                this.Invoke(new MethodInvoker(delegate
-                {
-                    if (!this.IsDisposed)
-                    {
-                        OutStatusImport(ex.ToString());
-                    }
-                }));
-            }
-        }
-
-        private async Task DownloadVideoTiktokAsync(TikTokModel tiktokModel)
-        {
-            try
-            {
-                string urlLink = await VideoHelper.GetNoWatermarkUrl(tiktokModel.UrlLink);
-
-                //Get UserName . Ex: @fbdfbfd
-                var lines = tiktokModel.UrlLink.Split('/').ToList();
-                string input = lines.SingleOrDefault(x => x.Contains("@"));
-                var userName = input.Replace("@", "");
-
-                string idVideo = lines.LastOrDefault();
-
-                string pathSaveFile = DEFAULT_FOLDER_PATH + "\\" + userName;
-                Utilities.CreateIfMissing(pathSaveFile);
-
-                string nameFileVideo = idVideo + ".mp4";
-                string fullPathVideo = pathSaveFile + "\\" + nameFileVideo;
-                if (string.IsNullOrEmpty(pathSaveFile))
-                {
-                    pathSaveFile = DEFAULT_FOLDER_PATH;
-                }
-
-                OutStatus($"Start Download file MP4: {idVideo}");
-                OutStatus($"Downloading.......");
-                using (var webClient = new WebClient())
-                {
-                    webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
-                    try
-                    {
-                        await webClient.DownloadFileTaskAsync(new Uri($"{urlLink}"), fullPathVideo);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("err");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
-            }
-        }
-
-        private async Task DownloadVideoTiktokImportAsync(TikTokModel tiktokModel)
-        {
-            try
-            {
-                string urlLink = await VideoHelper.GetNoWatermarkUrl(tiktokModel.UrlLink);
-
-                //Get UserName . Ex: @fbdfbfd
-                var lines = tiktokModel.UrlLink.Split('/').ToList();
-                string input = lines.SingleOrDefault(x => x.Contains("@"));
-                var userName = input.Replace("@", "");
-
-                string idVideo = lines.LastOrDefault();
-
-                string pathSaveFile = DEFAULT_FOLDER_PATH_IMPORT + "\\" + userName;
-                Utilities.CreateIfMissing(pathSaveFile);
-
-                string nameFileVideo = idVideo + ".mp4";
-                string fullPathVideo = pathSaveFile + "\\" + nameFileVideo;
-                if (string.IsNullOrEmpty(pathSaveFile))
-                {
-                    pathSaveFile = DEFAULT_FOLDER_PATH_IMPORT;
-                }
-
-                OutStatusImport($"Start Download file MP4: {idVideo}");
-                OutStatusImport($"Downloading.......");
-                using (var webClient = new WebClient())
-                {
-                    webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(CompletedImport);
-                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChangedImport);
-                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallbackImport);
-                    try
-                    {
-                        await webClient.DownloadFileTaskAsync(new Uri($"{urlLink}"), fullPathVideo);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("err");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
-            }
-        }
-
-        private void DownloadProgressCallback(object sender, DownloadProgressChangedEventArgs e)
-        {
-            this.Invoke(new MethodInvoker(delegate
-            {
-                if (!this.IsDisposed)
-                {
-                    pbDownload.Value = e.ProgressPercentage;
-                    lblProgress.Text = e.ProgressPercentage + "% complete... (" + e.BytesReceived + "/" + e.TotalBytesToReceive + ")"; ;
-                }
-            }));
-        }
-
-        private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            this.Invoke(new MethodInvoker(delegate
-            {
-                if (!this.IsDisposed)
-                {
-                    pbDownload.Value = e.ProgressPercentage;
-                    lblProgress.Text = e.ProgressPercentage + "% complete... (" + e.BytesReceived + "/" + e.TotalBytesToReceive + ")"; ;
-                }
-            }));
-        }
-
-        private void Completed(object? sender, AsyncCompletedEventArgs e)
-        {
-            this.Invoke(new MethodInvoker(delegate
-            {
-                if (!this.IsDisposed)
-                {
-                    OutStatus($"Download Completed!");
-                }
-            }));
-        }
-
-        private void DownloadProgressCallbackImport(object sender, DownloadProgressChangedEventArgs e)
-        {
-            this.Invoke(new MethodInvoker(delegate
-            {
-                if (!this.IsDisposed)
-                {
-                    pbDownloadImport.Value = e.ProgressPercentage;
-                    lbDownloadImport.Text = e.ProgressPercentage + "% complete... (" + e.BytesReceived + "/" + e.TotalBytesToReceive + ")"; ;
-                }
-            }));
-        }
-
-        private void ProgressChangedImport(object sender, DownloadProgressChangedEventArgs e)
-        {
-            this.Invoke(new MethodInvoker(delegate
-            {
-                if (!this.IsDisposed)
-                {
-                    pbDownloadImport.Value = e.ProgressPercentage;
-                    lbDownloadImport.Text = e.ProgressPercentage + "% complete... (" + e.BytesReceived + "/" + e.TotalBytesToReceive + ")"; ;
-                }
-            }));
-        }
-
-        private void CompletedImport(object? sender, AsyncCompletedEventArgs e)
-        {
-            this.Invoke(new MethodInvoker(delegate
-            {
-                if (!this.IsDisposed)
-                {
-                    OutStatusImport($"Download Completed!");
-                }
-            }));
-        }
-
         private async void btnDownloadImport_Click(object sender, EventArgs e)
         {
-            DisableWhenLoadFileImport();
-            await DownloadVideoListTiktokImport();
-            EnableWhenLoadFileDoneImport();
+            try
+            {
+                DisableWhenLoadFileImport();
+                await DownloadVideoListTiktokImport();
+                EnableWhenLoadFileDoneImport();
+            }
+            catch (OperationCanceledException)
+            {
+                OutStatusImport("Download canceled");
+            }
+            catch (Exception ex)
+            {
+                OutStatusImport($"Error: {ex.Message}");
+            }
         }
 
         private async void btnDownload_Click(object sender, EventArgs e)
         {
-            DisableWhenLoadFile();
-            await DownloadVideoListTiktok();
-            EnableWhenLoadFileDone();
+            try
+            {
+                DisableWhenLoadFile();
+                await DownloadVideoListTiktok();
+                EnableWhenLoadFileDone();
+            }
+            catch (OperationCanceledException)
+            {
+                OutStatusImport("Download canceled");
+            }
+            catch (Exception ex)
+            {
+                OutStatusImport($"Error: {ex.Message}");
+            }
+        }
+
+        private void btnStopDownloadImport_Click(object sender, EventArgs e)
+        {
+            CancelOperations(_cancellationTokenSourceDownloadImport);
+        }
+        
+        private void btnStopDownload_Click(object sender, EventArgs e)
+        {
+            CancelOperations(_cancellationTokenSourceDownload);
+        }
+
+        private void CancelOperations(CancellationTokenSource _cts)
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = new CancellationTokenSource();
         }
 
         

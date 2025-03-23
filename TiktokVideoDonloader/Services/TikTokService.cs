@@ -139,7 +139,7 @@ namespace TiktokVideoDonloader.Services
                         model.User = items.Where(x => x.Contains("@")).FirstOrDefault();
                         listResult.Add(model);
                         var finalResult = listResult.DistinctBy(i => i.ID).ToList();
-                        Program.HOME_FORM.OutThongKe(finalResult.Count.ToString());
+                        Program.HOME_FORM.OutStatus(finalResult.Count.ToString());
                     }
 
                     var listModelDistinct = listResult.DistinctBy(i => i.ID).ToList();
@@ -164,7 +164,7 @@ namespace TiktokVideoDonloader.Services
                 tikTokModelList = listTiktok.DistinctBy(i => i.ID).ToList();
 
                 total = tikTokModelList.Count;
-                Program.HOME_FORM.OutThongKe(total.ToString());
+                Program.HOME_FORM.OutStatus("Total of downloaded videos:" + total.ToString());
                 //return tikTokModelList;
             }
             catch (Exception ex)

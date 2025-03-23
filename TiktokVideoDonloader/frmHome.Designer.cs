@@ -75,12 +75,14 @@
             tabPage2 = new TabPage();
             tabControl3 = new TabControl();
             tabPage3 = new TabPage();
+            btnStopDownloadImport = new Button();
             lbDownloadImport = new Label();
             pbDownloadImport = new ProgressBar();
             btnDownloadImport = new Button();
             dgvImportFile = new DataGridView();
             tabPage4 = new TabPage();
             txtStatusImport = new TextBox();
+            btnStopDownload = new Button();
             grpDownloadList.SuspendLayout();
             grbDownloader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericThread).BeginInit();
@@ -494,6 +496,7 @@
             // 
             // tabVideoList
             // 
+            tabVideoList.Controls.Add(btnStopDownload);
             tabVideoList.Controls.Add(btnDownload);
             tabVideoList.Controls.Add(dgvVideoList);
             tabVideoList.Controls.Add(lblProgress);
@@ -509,10 +512,10 @@
             // btnDownload
             // 
             btnDownload.Font = new Font("Segoe UI", 7.8F);
-            btnDownload.Location = new Point(525, 7);
+            btnDownload.Location = new Point(458, 7);
             btnDownload.Margin = new Padding(3, 4, 3, 4);
             btnDownload.Name = "btnDownload";
-            btnDownload.Size = new Size(103, 30);
+            btnDownload.Size = new Size(80, 30);
             btnDownload.TabIndex = 3;
             btnDownload.Text = "Download";
             btnDownload.UseVisualStyleBackColor = true;
@@ -559,12 +562,12 @@
             // 
             // txtStatus
             // 
-            txtStatus.Enabled = false;
             txtStatus.Font = new Font("Segoe UI", 7.20000029F);
             txtStatus.Location = new Point(9, 7);
             txtStatus.Margin = new Padding(3, 4, 3, 4);
             txtStatus.Multiline = true;
             txtStatus.Name = "txtStatus";
+            txtStatus.ReadOnly = true;
             txtStatus.Size = new Size(621, 424);
             txtStatus.TabIndex = 47;
             // 
@@ -614,6 +617,7 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(btnStopDownloadImport);
             tabPage3.Controls.Add(lbDownloadImport);
             tabPage3.Controls.Add(pbDownloadImport);
             tabPage3.Controls.Add(btnDownloadImport);
@@ -625,6 +629,18 @@
             tabPage3.TabIndex = 0;
             tabPage3.Text = "Result";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // btnStopDownloadImport
+            // 
+            btnStopDownloadImport.Font = new Font("Segoe UI", 7.8F);
+            btnStopDownloadImport.Location = new Point(544, 12);
+            btnStopDownloadImport.Margin = new Padding(3, 4, 3, 4);
+            btnStopDownloadImport.Name = "btnStopDownloadImport";
+            btnStopDownloadImport.Size = new Size(80, 30);
+            btnStopDownloadImport.TabIndex = 45;
+            btnStopDownloadImport.Text = "Stop";
+            btnStopDownloadImport.UseVisualStyleBackColor = true;
+            btnStopDownloadImport.Click += btnStopDownloadImport_Click;
             // 
             // lbDownloadImport
             // 
@@ -648,10 +664,10 @@
             // btnDownloadImport
             // 
             btnDownloadImport.Font = new Font("Segoe UI", 7.8F);
-            btnDownloadImport.Location = new Point(525, 12);
+            btnDownloadImport.Location = new Point(458, 12);
             btnDownloadImport.Margin = new Padding(3, 4, 3, 4);
             btnDownloadImport.Name = "btnDownloadImport";
-            btnDownloadImport.Size = new Size(103, 30);
+            btnDownloadImport.Size = new Size(80, 30);
             btnDownloadImport.TabIndex = 42;
             btnDownloadImport.Text = "Download";
             btnDownloadImport.UseVisualStyleBackColor = true;
@@ -679,15 +695,27 @@
             // 
             // txtStatusImport
             // 
-            txtStatusImport.Enabled = false;
             txtStatusImport.Font = new Font("Segoe UI", 7.20000029F);
             txtStatusImport.Location = new Point(9, 7);
             txtStatusImport.Margin = new Padding(3, 4, 3, 4);
             txtStatusImport.Multiline = true;
             txtStatusImport.Name = "txtStatusImport";
+            txtStatusImport.ReadOnly = true;
             txtStatusImport.ScrollBars = ScrollBars.Vertical;
             txtStatusImport.Size = new Size(625, 427);
             txtStatusImport.TabIndex = 48;
+            // 
+            // btnStopDownload
+            // 
+            btnStopDownload.Font = new Font("Segoe UI", 7.8F);
+            btnStopDownload.Location = new Point(544, 7);
+            btnStopDownload.Margin = new Padding(3, 4, 3, 4);
+            btnStopDownload.Name = "btnStopDownload";
+            btnStopDownload.Size = new Size(80, 30);
+            btnStopDownload.TabIndex = 46;
+            btnStopDownload.Text = "Stop";
+            btnStopDownload.UseVisualStyleBackColor = true;
+            btnStopDownload.Click += btnStopDownload_Click;
             // 
             // frmHome
             // 
@@ -776,5 +804,7 @@
         private Button btnSelectFolderImport;
         private TextBox txtPathSaveImport;
         private Label label5;
+        private Button btnStopDownloadImport;
+        private Button btnStopDownload;
     }
 }
